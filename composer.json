@@ -1,5 +1,5 @@
 {
-    "name": "buttercoin/buttercoinsdk-php",
+    "name": "buttercoin/buttercoin-sdk",
     "description": "A PHP library for connecting to the Buttercoin API",
     "type": "library",
     "license": "MIT",
