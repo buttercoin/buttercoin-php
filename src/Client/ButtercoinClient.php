@@ -1,6 +1,8 @@
 <?php
 
 namespace Buttercoin\Client;
+
+use Guzzle\Common\Collection;
 use Guzzle\Service\Client;
 use Guzzle\Service\Description\ServiceDescription;
 use Buttercoin\Exception\RuntimeException;
