@@ -1,0 +1,37 @@
+{
+    "name": "buttercoin/buttercoinsdk-php",
+    "description": "A PHP library for connecting to the Buttercoin API",
+    "type": "library",
+    "license": "MIT",
+    "keywords": [
+        "buttercoin",
+        "bitcoin",
+		"cryptocurrency",
+		"btc",
+		"trading"
+    ],
+    "require": {
+        "php": ">=5.3.3",
+        "guzzle/guzzle": "~3.8.1"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "*"
+    },
+    "homepage": "http://www.buttercoin.com",
+    "autoload": {
+        "psr-4": {
+            "Buttercoin\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Buttercoin\\Tests\\": "tests/Tests"
+        }
+    },
+    "authors": [
+        {
+            "name": "Kevin Adams",
+            "email": "kevin@buttercoin.com"
+        }
+    ]
+}
