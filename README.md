@@ -67,6 +67,10 @@ date_default_timezone_set('UTC'); // Do this only once
 $timestamp = round(microtime(true) * 1000);
 ```
 
+**WARNING**
+
+For Query and Post Params, there is a limitation from the Guzzle library that you always add the params to your array in the order they are displayed in tables below.  If you don't do this, the HMAC-SHA256 signature will not be correct and you will get a `401` request error.
+
 ### Get Data
 
 ###### Unauthenticated
@@ -82,7 +86,7 @@ $client->getOrderBook();
 Return the current bid, ask, and last sell prices on the Buttercoin platform
 
 ```php
-$client.getTicker();
+$client->getTicker();
 ```
 
 ###### Authenticated
@@ -105,7 +109,7 @@ $client.getBalances($timestamp);
 Returns bitcoin address `string` to deposit your funds into the Buttercoin platform
 
 ```php
-$client.getDepositAddress($timestamp);
+$client->getDepositAddress($timestamp);
 ```
 
 **Get Orders**  
@@ -125,12 +129,12 @@ Date Max | `dateMax` | format: ISO-8601, e.g. `'2014-05-06T13:15:30Z'`
 // query for multiple orders
 $orderParams = [ "status" => "canceled", "side" => "sell" ];
 
-$client.getOrders($orderParams, $timestamp);
+$client->getOrders($orderParams, $timestamp);
 
 // single order by id
 $orderId = '<order_id>';
 
-$client.getOrder($orderId, $timestamp);
+$client->getOrder($orderId, $timestamp);
 ```
 
 **Get Transaction**  
@@ -149,11 +153,11 @@ Date Max | `dateMax` | format: ISO-8601, e.g. `'2014-05-06T13:15:30Z'`
 // query for multiple transactions
 $trxnParams = [ "status" => "funded", "transactionType" => "deposit" ];
 
-$client.getTransactions($trxnParams, $timestamp);
+$client->getTransactions($trxnParams, $timestamp);
 
 var trxnId = '53a22ce164f23e7301a4fee5';
 
-$client.getTransaction(trxnId, $timestamp);
+$client->getTransaction(trxnId, $timestamp);
 ```
 
 ### Create New Actions
@@ -180,7 +184,7 @@ $order = [
   "quantity" => "5"
 ];
 
-$client.createOrder(order, $timestamp);
+$client->createOrder(order, $timestamp);
 ```
 
 **Create Transaction**  
@@ -201,7 +205,7 @@ $trxnObj = [
   "amount" => "5002"
 ];
 
-$client.createDeposit($trxnObj, $timestamp);
+$client->createDeposit($trxnObj, $timestamp);
 ```
 
 Withdrawal transaction params include: 
@@ -221,7 +225,7 @@ $trxnObj = [
   "amount" => "900.23"
 ];
 
-$client.createWithdrawal($trxnObj, $timestamp);
+$client->createWithdrawal($trxnObj, $timestamp);
 ```
 Send bitcoin transaction params include: 
 
@@ -239,7 +243,7 @@ $trxnObj = [
   "destination" => "<bitcoin_address>"
 ];
 
-$client.sendCrypto($trxnObj, $timestamp);
+$client->sendCrypto($trxnObj, $timestamp);
 ```
 
 
@@ -251,14 +255,14 @@ All successful cancel calls to the API return a response status of `204` with a 
 Cancel a pending buy or sell order
 
 ```php
-$client.cancelOrder($orderId, $timestamp);
+$client->cancelOrder($orderId, $timestamp);
 ```
 
 **Cancel Transaction**  
 Cancel a pending deposit or withdraw action
 
 ```php
-$client.cancelTransaction($trxnId, $timestamp);
+$client->cancelTransaction($trxnId, $timestamp);
 ```
 
 ## Further Reading
