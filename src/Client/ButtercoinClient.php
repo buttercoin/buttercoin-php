@@ -5,7 +5,9 @@ namespace Buttercoin\Client;
 use Guzzle\Common\Collection;
 use Guzzle\Service\Client;
 use Guzzle\Service\Description\ServiceDescription;
-use Buttercoin\Exception\RuntimeException;
+use Guzzle\Http\Exception\BadResponseException;
+use Guzzle\Http\Exception\ClientErrorResponseException;
+use Guzzle\Common\Event;
 
 /**
  * Class ButtercoinClient
@@ -18,12 +20,23 @@ class ButtercoinClient extends Client
 {
 	public static function factory ($config = array())
 	{
+		// default to production environment
 		$default = array(
-			'baseUrl' => 'http://localhost:9002/{version}/',
+			'baseUrl' => 'https://api.buttercoin.com/{version}/',
 			'version' => 'v1',
 			'publicKey' => null,
 			'secretKey' => null
 		);
+
+		if (isset($config['environment'])) {
+			if ($config['environment'] === 'staging') {
+				$default['baseUrl'] = 'https://api.qa.dcxft.com/{version}/';
+			} else if ($config['environment'] === 'localhost') {
+				$default['baseUrl'] = 'https://localhost:9002/{version}/';
+			} else if ($config['environment'] !== 'production') {
+				throw new Exception('Invalid environment');
+			}	
+		}
 
 		$config = Collection::fromConfig($config, $default);
 
@@ -33,7 +46,7 @@ class ButtercoinClient extends Client
 		$client->setDescription(ServiceDescription::factory(__DIR__ . "/Resources/{$file}"));
 
 		// Set the content type header to use "application/json" for all requests
-        $client->setDefaultOption('headers', array('Content-Type' => 'application/json'));
+		$client->setDefaultOption('headers', array('Content-Type' => 'application/json'));
 
         return $client;
 	}
@@ -133,10 +146,10 @@ class ButtercoinClient extends Client
 	 * get URL
 	 *
 	 * @param string $command the command to use to create the URL
-	 * @params array $params the params to use for the method
-	 * @params boolean $handleParams set to true if params are part of the signed URL separately 
+	 * @param array $params the params to use for the method
+	 * @param boolean $handleParams set to true if params are part of the signed URL separately 
 	 *
-	 * return string the full url with properly formatted query params (json for POST, queryString for get)
+	 * return string the full url with properly formatted query params (json for POST, queryString for GET)
 	 */
 	public function getUrl($command, $params, $handleParams = true)
 	{
@@ -153,36 +166,32 @@ class ButtercoinClient extends Client
 				$url .= json_encode($params);
 			}
 		}
-		print_r($url . PHP_EOL);
 		
-		// TODO: logic for GET and POST requests to add query params if necessary
 		return $url;
 	}
 
 	/**
 	 * Shortcut for the getTicker command
 	 *
-	 * @param integer $timestamp UNIX timestamp must be within 5 mins of Buttercoin UTC server time
-	 *
 	 * @return mixed
 	 */
-	public function getTicker($timestamp)
+	public function getTicker()
 	{
-
-		return $this->buildCommand('getTicker', $timestamp);
+		// set headers, if necessary
+		$this->_setHeaders(null, null, false);
+		return $this->_sendCommand('getTicker');
 	}
 
 	/**
 	 * Shortcut for the getOrderBook command
 	 *
-	 * @param integer $timestamp UNIX timestamp must be within 5 mins of Buttercoin UTC server time
-	 *
 	 * @return mixed
 	 */
-	public function getOrderBook($timestamp)
+	public function getOrderBook()
 	{
-
-		return $this->buildCommand('getOrderBook', $timestamp);
+		// set headers, if necessary
+		$this->_setHeaders(null, null, false);
+		return $this->_sendCommand('getOrderBook');
 	}
 
 	/**
@@ -194,7 +203,12 @@ class ButtercoinClient extends Client
 	 */
 	public function getKey($timestamp)
 	{
-		return $this->buildCommand('getKey', $timestamp);
+		$result = $this->_buildCommand('getKey', $timestamp);
+		if (isset($result['errors'])) {
+			return $result;
+		} else {
+			return $result['permissions'];
+		}
 	}
 
 	/**
@@ -206,7 +220,7 @@ class ButtercoinClient extends Client
 	 */
 	public function getBalances($timestamp)
 	{
-		return $this->buildCommand('getBalances', $timestamp);
+		return $this->_buildCommand('getBalances', $timestamp);
 	}
 
 	/**
@@ -218,34 +232,57 @@ class ButtercoinClient extends Client
 	 */
 	public function getDepositAddress($timestamp)
 	{
-		return $this->buildCommand('getDepositAddress', $timestamp);
+		$result = $this->_buildCommand('getDepositAddress', $timestamp);
+		if (isset($result['errors'])) {
+			return $result;
+		} else {
+			return $result['address'];
+		}
 	}
 
 	/**
-	 * Shortcut for the createOrder command
+	 * Shortcut for the getOrder command
 	 *
 	 * @param string $orderId the UUIDv4 id of the order to get
 	 * @param integer $timestamp UNIX timestamp must be within 5 mins of Buttercoin UTC server time
 	 *
 	 * @return mixed
 	 */
-	public function getOrder($orderId, $timestamp )
+	public function getOrderById($orderId, $timestamp )
 	{
-		return $this->buildCommand('getOrder', $timestamp, ["id" => $orderId], false);
+		return $this->_buildCommand('getOrder', $timestamp, ["id" => $orderId], false);
 	}
 
 	/**
-	 * Shortcut for the createOrder command
+	 * Shortcut for the getOrderByUrl command
 	 *
-	 * @param array $data array contain data for order creation (Please see Buttercoin docs)
+	 * @param string $url the location URL of the order to get
+	 * @param integer $timestamp UNIX timestamp must be within 5 mins of Buttercoin UTC server time
+	 *
+	 * @return mixed
+	 */
+	public function getOrderByUrl($url, $timestamp )
+	{
+		$orderId = self::_parseId($url);
+		return $this->_buildCommand('getOrder', $timestamp, ["id" => "$orderId"], false);
+	}
+
+	/**
+	 * Shortcut for the getOrders command
+	 *
+	 * @param array $data array contain data for order query (Please see Buttercoin docs)
 	 * @param integer $timestamp UNIX timestamp must be within 5 mins of Buttercoin UTC server time
 	 *
 	 * @return mixed
 	 */
 	public function getOrders($data, $timestamp)
 	{
-		$orders = $this->buildCommand('getOrders', $timestamp, $data);
-		return $orders['results'];
+		$result = $this->_buildCommand('getOrders', $timestamp, $data);
+		if (isset($result['errors'])) {
+			return $result;
+		} else {
+			return $result['results'];
+		}
 	}
 
 	/**
@@ -258,32 +295,206 @@ class ButtercoinClient extends Client
 	 */
 	public function createOrder($data, $timestamp)
 	{
-		return $this->buildCommand('createOrder', $timestamp, $data);
+		$result = $this->_buildCommand('createOrder', $timestamp, $data);
+		if (is_array($result) && isset($result['errors'])) {
+			return $result;
+		} else {
+			return $result->getLocation();
+		}
 	}
 
 	/**
-	 * Shortcut for the deleteOrder command
+	 * Shortcut for the cancelOrder command
 	 *
-	 * @param string $orderId the UUIDv4 id of the order to delete
+	 * @param string $orderId the UUIDv4 id of the order to cancel
 	 * @param integer $timestamp UNIX timestamp must be within 5 mins of Buttercoin UTC server time
 	 *
 	 * @return mixed
 	 */
-	public function deleteOrder($orderId, $timestamp )
+	public function cancelOrder($orderId, $timestamp )
 	{
-		return $this->buildCommand('deleteOrder', $timestamp, ["id" => $orderId], false);
+		$result = $this->_buildCommand('cancelOrder', $timestamp, ["id" => $orderId], false);
+		if (is_array($result) && isset($result['errors'])) {
+			return $result;
+		} else {
+			return [ 'status' => 204, 'message' => 'Order canceled successfully'];
+		}
 	}
 
-	private function buildCommand($command, $timestamp, $params = [], $handleParams = true)
+	/**
+	 * Shortcut for the getTransactionById command
+	 *
+	 * @param string $transactionId the UUIDv4 id of the transaction to get
+	 * @param integer $timestamp UNIX timestamp must be within 5 mins of Buttercoin UTC server time
+	 *
+	 * @return mixed
+	 */
+	public function getTransactionById($transactionId, $timestamp )
 	{
-		$url = $this->getUrl($command, $params, $handleParams);
+		return $this->_buildCommand('getTransaction', $timestamp, ["id" => $transactionId], false);
+	}
 
-		$params['X-Buttercoin-Access-Key'] = $this->getConfig('publicKey');
-		$params['X-Buttercoin-Date'] = "$timestamp";
-		$params['X-Buttercoin-Signature'] = $this->getXButtercoinSignature($url, $timestamp);
-		$params['X-Forwarded-For'] = '127.0.0.1';
-		print_r($params);
+	/**
+	 * Shortcut for the getTransactionByUrl command
+	 *
+	 * @param string $url the location URL of the order to get
+	 * @param integer $timestamp UNIX timestamp must be within 5 mins of Buttercoin UTC server time
+	 *
+	 * @return mixed
+	 */
+	public function getTransactionByUrl($url, $timestamp )
+	{
+		$transactionId = self::_parseId($url);
+		return $this->_buildCommand('getTransaction', $timestamp, ["id" => "$transactionId"], false);
+	}
+	
+	/**
+	 * Shortcut for the getTransactions command
+	 *
+	 * @param array $data array contain data for transaction query (Please see Buttercoin docs)
+	 * @param integer $timestamp UNIX timestamp must be within 5 mins of Buttercoin UTC server time
+	 *
+	 * @return mixed
+	 */
+	public function getTransactions($data, $timestamp)
+	{
+		$result = $this->_buildCommand('getTransactions', $timestamp, $data);
+		if (isset($result['errors'])) {
+			return $result;
+		} else {
+			return $result['results'];
+		}
+	}
+
+	/**
+	 * Shortcut for the createDeposit command
+	 *
+	 * @param array $data array contain data for deposit creation (Please see Buttercoin docs)
+	 * @param integer $timestamp UNIX timestamp must be within 5 mins of Buttercoin UTC server time
+	 *
+	 * @return mixed
+	 */
+	public function createDeposit($data, $timestamp)
+	{
+		$result = $this->_buildCommand('createDeposit', $timestamp, $data);
+		if (is_array($result) && isset($result['errors'])) {
+			return $result;
+		} else {
+			return $result->getLocation();
+		}
+	}
+
+	/**
+	 * Shortcut for the createWithdrawal command
+	 *
+	 * @param array $data array contain data for withdrawal creation (Please see Buttercoin docs)
+	 * @param integer $timestamp UNIX timestamp must be within 5 mins of Buttercoin UTC server time
+	 *
+	 * @return mixed
+	 */
+	public function createWithdrawal($data, $timestamp)
+	{
+		$result = $this->_buildCommand('createWithdrawal', $timestamp, $data);
+		if (is_array($result) && isset($result['errors'])) {
+			return $result;
+		} else {
+			if ($result->getStatusCode() === 201) {
+				return [ "status" => 201, "message" => "Withdraw request created, but email confirmation is required" ];
+			} else {
+				return [ "status" => 202, "message" => $result->getLocation()];
+			}
+		}
+	}
+
+	/**
+	 * Shortcut for the sendCrypto command
+	 *
+	 * @param array $data array contain data for send creation (Please see Buttercoin docs)
+	 * @param integer $timestamp UNIX timestamp must be within 5 mins of Buttercoin UTC server time
+	 *
+	 * @return mixed
+	 */
+	public function sendCrypto($data, $timestamp)
+	{
+		$result = $this->_buildCommand('send', $timestamp, $data);
+		if (is_array($result) && isset($result['errors'])) {
+			return $result;
+		} else {
+			if ($result.getStatusCode() === 201) {
+				return [ "status" => 201, "message" => "Send request created, but email confirmation is required" ];
+			} else {
+				return [ "status" => 202, "message" => $result->getLocation()];
+			}
+		}
+	}
+
+	/**
+	 * Shortcut for the cancelTransaction command
+	 *
+	 * @param string $transactionId the UUIDv4 id of the order to cancel
+	 * @param integer $timestamp UNIX timestamp must be within 5 mins of Buttercoin UTC server time
+	 *
+	 * @return mixed
+	 */
+	public function cancelTransaction($transactionId, $timestamp )
+	{
+		$result = $this->_buildCommand('cancelTransaction', $timestamp, ["id" => $transactionId], false);
+		if (is_array($result) && isset($result['errors'])) {
+			return $result;
+		} else {
+			return [ 'status' => 204, 'message' => 'Transaction canceled successfully'];
+		}
+	}
+
+	/**
+	 * Set Headers, build URL, and send the authenticated request
+	 *
+	 * @param string $command the name of the command to send
+	 * @param integer $timestamp UNIX timestamp must be withing 5 mins of Buttercoin UTC server time
+	 * @param array $params request params to send
+	 * @param boolean $handleParams if true, add the params in the proper format for URL signing
+	 */
+	private function _buildCommand($command, $timestamp, $params = [], $handleParams = true)
+	{
 		$this->getConfig()->set('command.params', $params);
-		return $this->getCommand($command, $params)->getResult();
+		$url = $this->getUrl($command, $params, $handleParams);
+		$this->_setHeaders($url, $timestamp);
+		return $this->_sendCommand($command, $params);
+	}
+
+	private function _sendCommand($command, $params = [])
+	{
+		try {
+			return $this->getCommand($command, $params)->execute();
+		} catch (ClientErrorResponseException $e) {
+			$response = $e->getResponse();
+			return json_decode($response->getBody(true), true);
+		}
+	}
+
+	/**
+	 * Set Headers for the API Request
+	 * 
+	 * @param string $url the correctly formatted url to sign
+	 * @param integer $timestamp UNIX timestamp must be withing 5 mins of Buttercoin UTC server time
+	 * @param boolean $authenticate set to false for unauthenticated requests (e.g. ticker or orderbook)
+	 */
+	private function _setHeaders($url, $timestamp, $authenticate = true)
+	{
+		$params = $this->getConfig()->get('command.params');
+		if ($authenticate === true) {
+			$params['X-Buttercoin-Access-Key'] = $this->getConfig('publicKey');
+			$params['X-Buttercoin-Date'] = "$timestamp";
+			$params['X-Buttercoin-Signature'] = $this->getXButtercoinSignature($url, $timestamp);
+		}
+		if ($this->getConfig()->get('environment') === 'localhost') {
+			$params['X-Forwarded-For'] = '127.0.0.1';
+		}
+		$this->getConfig()->set('command.params', $params);
+	}
+
+	private static function _parseId($url)
+	{
+		return substr(strrchr($url, '/'), 1);
 	}
 }
