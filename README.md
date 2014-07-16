@@ -111,7 +111,7 @@ $client.getDepositAddress($timestamp);
 **Get Orders**  
 Returns `array` of `arrays` containing information about buy and sell orders
 
-Valid params include (must be added to array in this order):
+Valid params include (must be added to array in this order): 
 Name | Param | Description
 --- | --- | ---
 Status | `status` | enum: `['opened', 'reopened', 'filled', 'canceled']`  
@@ -158,7 +158,7 @@ $client.getTransaction(trxnId, $timestamp);
 
 **Create Order**  
 
-Valid order params include:
+Valid order params include: 
 Name | Param | Description
 --- | --- | ---
 Instrument | `instrument` | enum: `['BTC_USD, USD_BTC']`
@@ -218,7 +218,7 @@ $trxnObj = [
 
 $client.createWithdrawal($trxnObj, $timestamp);
 ```
-Send bitcoin transaction params include:  
+Send bitcoin transaction params include: 
 Name | Param | Description
 --- | --- | --- 
 Currency | `currency` | `['USD']`, required `true`  
