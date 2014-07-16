@@ -102,7 +102,7 @@ $client->getKey($timestamp);
 Returns `array` of balances for this account
 
 ```php
-$client.getBalances($timestamp);
+$client->getBalances($timestamp);
 ```
 
 **Deposit Address**  
