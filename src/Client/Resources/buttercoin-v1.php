@@ -304,7 +304,7 @@ return array(
 					'location' 		=> 'json',
 					'description'	=> 'the amount paid for the asset',
 					'type'     		=> 'string',
-					'required'		=> true
+					'required'		=> false
 				),
 				'quantity' 	      	=> array(
 					'location' 		=> 'json',
@@ -609,6 +609,12 @@ return array(
 				'amount'       		=> array(
 					'location' 		=> 'json',
 					'description'	=> 'amount to withdraw',
+					'type'     		=> 'string',
+					'required'		=> true
+				),
+				'destination'  		=> array(
+					'location' 		=> 'json',
+					'description'	=> 'Address of crytpocurrency',
 					'type'     		=> 'string',
 					'required'		=> true
 				)

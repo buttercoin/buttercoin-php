@@ -130,6 +130,26 @@ class ButtercoinClient extends Client
 	}
 
 	/**
+	 * set Environment
+	 *
+	 * @param string $environment
+	 */
+	public function setEnvironment($environment)
+	{
+		return $this->getConfig()->set('environment', $environment);
+	}
+
+	/**
+	 * get Environment
+	 *
+	 * @return string|null value of environment
+	 */
+	public function getEnvironment()
+	{
+		return $this->getConfig('environment');
+	}
+
+	/**
 	 * get X-Buttercoin-Signature
 	 *
 	 * @return string|null value of X-Buttercoin-Signature
