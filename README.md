@@ -69,7 +69,7 @@ $timestamp = round(microtime(true) * 1000);
 
 ### Get Data
 
-*** Unauthenticated ***
+###### Unauthenticated
 
 **Get Order Book**  
 Return an `array` of current orders in the Buttercoin order book
@@ -85,7 +85,7 @@ Return the current bid, ask, and last sell prices on the Buttercoin platform
 $client.getTicker();
 ```
 
-*** Authenticated ***
+###### Authenticated
 
 **Key Permissions**  
 Returns `array` of permissions associated with this key
@@ -111,7 +111,8 @@ $client.getDepositAddress($timestamp);
 **Get Orders**  
 Returns `array` of `arrays` containing information about buy and sell orders
 
-Valid params include (must be added to array in this order): 
+Valid params include (must be added to array in this order):
+
 Name | Param | Description
 --- | --- | ---
 Status | `status` | enum: `['opened', 'reopened', 'filled', 'canceled']`  
@@ -133,9 +134,10 @@ $client.getOrder($orderId, $timestamp);
 ```
 
 **Get Transaction**  
-Returns `array` of `arrays` containing information about deposit and withdraw action
+Returns `array` of `arrays` containing information about deposit and withdraw action 
 
-Valid params include (must be added to array in this order): 
+Valid params include (must be added to array in this order):
+
 Name | Param | Description
 --- | --- | ---
 Status | `status` | enum: `['pending', 'processing', 'funded', 'canceled', 'failed']`  
@@ -159,6 +161,7 @@ $client.getTransaction(trxnId, $timestamp);
 **Create Order**  
 
 Valid order params include: 
+
 Name | Param | Description
 --- | --- | ---
 Instrument | `instrument` | enum: `['BTC_USD, USD_BTC']`
@@ -183,6 +186,7 @@ $client.createOrder(order, $timestamp);
 **Create Transaction**  
 
 Deposit transaction params include: 
+
 Name | Param | Description
 --- | --- | ---
 Method | `method` | enum: `['wire']`, required `true`  
@@ -201,6 +205,7 @@ $client.createDeposit($trxnObj, $timestamp);
 ```
 
 Withdrawal transaction params include: 
+
 Name | Param | Description
 --- | --- | --- 
 Method | `method` | enum: `['check']`, required `true`  
@@ -219,6 +224,7 @@ $trxnObj = [
 $client.createWithdrawal($trxnObj, $timestamp);
 ```
 Send bitcoin transaction params include: 
+
 Name | Param | Description
 --- | --- | --- 
 Currency | `currency` | `['USD']`, required `true`  
