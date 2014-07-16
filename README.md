@@ -218,7 +218,6 @@ Amount | `amount` | `string`, required `true`
 
 ```php
 // create withdrawal
-// create deposit
 $trxnObj = [
   "method" => "check",
   "currency" => "USD",
