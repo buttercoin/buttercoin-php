@@ -211,7 +211,7 @@ class ButtercoinClient extends Client
 	 */
 	public function getKey($timestamp = null)
 	{
-		$result = $this->_buildCommand('getKey', $timestamp = null);
+		$result = $this->_buildCommand('getKey', $timestamp);
 		if (isset($result['errors'])) {
 			return $result;
 		} else {
