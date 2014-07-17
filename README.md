@@ -1,11 +1,11 @@
-Buttercoin PHP Library
+Buttercoin PHP SDK Library
 ===================
 Easy integration with the Buttercoin Trading Platform through our API.
 
 Installation with Composer
 --------------------------
 ```sh
-$ php composer.phar require buttercoin/buttercoin-sdk:dev-master
+$ php composer.phar require buttercoin/buttercoin-sdk:~0.0.2
 ```
 
 Usage
@@ -65,6 +65,13 @@ Before every call, get a new timestamp.  (You need only set the timezone once)
 ```php
 date_default_timezone_set('UTC'); // Do this only once
 $timestamp = round(microtime(true) * 1000);
+$client->getKey($timestamp);
+```
+
+Additionally, for convenience, if you don't include the timestamp parameter, it will default to the current timestamp.
+
+```php
+$client->getKey();
 ```
 
 **WARNING**
@@ -134,7 +141,12 @@ $client->getOrders($orderParams, $timestamp);
 // single order by id
 $orderId = '<order_id>';
 
-$client->getOrder($orderId, $timestamp);
+$client->getOrderById($orderId, $timestamp);
+
+// single order by url
+$url = 'https://api.buttercoin.com/v1/orders/{order_id}';
+
+$client->getOrderByUrl($url, $timestamp);
 ```
 
 **Get Transaction**  
@@ -155,9 +167,14 @@ $trxnParams = [ "status" => "funded", "transactionType" => "deposit" ];
 
 $client->getTransactions($trxnParams, $timestamp);
 
-var trxnId = '53a22ce164f23e7301a4fee5';
+$trxnId = '53a22ce164f23e7301a4fee5';
 
-$client->getTransaction(trxnId, $timestamp);
+$client->getTransactionById($trxnId, $timestamp);
+
+// single transaction by url
+$url = 'https://api.buttercoin.com/v1/orders/{order_id}';
+
+$client->getTransactionByUrl($url, $timestamp);
 ```
 
 ### Create New Actions
@@ -178,13 +195,13 @@ Quantity | `quantity` | `string`, required `false`
 // create an array with the following params
 $order = [
   "instrument" => "BTC_USD",
-  "orderAction" => "buy",
+  "side" => "buy",
   "orderType" => "limit",
   "price" => "700.00"
   "quantity" => "5"
 ];
 
-$client->createOrder(order, $timestamp);
+$client->createOrder($order, $timestamp);
 ```
 
 **Create Transaction**  
@@ -281,6 +298,11 @@ The aim is to take your great ideas and make everyone's experience using Butterc
 ### 0.0.1
 
 - First release.
+
+### 0.0.2
+
+- Made timestamp an optional field, defaults to current timestamp
+- Fixed errors in README file
 
 ## License
 

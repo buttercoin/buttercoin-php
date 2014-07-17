@@ -52,19 +52,6 @@ class ButtercoinClient extends Client
 	}
 
 	/**
-     * Magic method used to retrieve a command
-     *
-     * @param string $method Name of the command object to instantiate
-     * @param array  $args   Arguments to pass to the command
-     *
-     * @return mixed Returns the result of the command
-     */
-    public function __call($method, $args)
-    {
-        return $this->getCommand($method, $args)->getResult();
-    }
-
-	/**
      * Sets the API Version used by the Buttercoin Client.
      * Changing the API Version will attempt to load a new Service Definition for that Version.
      *
@@ -175,7 +162,8 @@ class ButtercoinClient extends Client
 	{
 		$url = str_replace('{version}', $this->getConfig('version'), $this->getConfig('baseUrl'));
 		$url .= $this->getCommand($command, [])->getClient()->getDescription()->getOperation($command)->getUri();
-		$url = str_replace('{id}', $params['id'], $url);
+		if (isset($params['id']))
+			$url = str_replace('{id}', $params['id'], $url);
 
 		$httpMethod = $this->getCommand($command, [])->getClient()->getDescription()->getOperation($command)->getHttpMethod();
 
@@ -221,9 +209,9 @@ class ButtercoinClient extends Client
 	 *
 	 * @return mixed
 	 */
-	public function getKey($timestamp)
+	public function getKey($timestamp = null)
 	{
-		$result = $this->_buildCommand('getKey', $timestamp);
+		$result = $this->_buildCommand('getKey', $timestamp = null);
 		if (isset($result['errors'])) {
 			return $result;
 		} else {
@@ -238,7 +226,7 @@ class ButtercoinClient extends Client
 	 *
 	 * @return mixed
 	 */
-	public function getBalances($timestamp)
+	public function getBalances($timestamp = null)
 	{
 		return $this->_buildCommand('getBalances', $timestamp);
 	}
@@ -250,7 +238,7 @@ class ButtercoinClient extends Client
 	 *
 	 * @return mixed
 	 */
-	public function getDepositAddress($timestamp)
+	public function getDepositAddress($timestamp = null)
 	{
 		$result = $this->_buildCommand('getDepositAddress', $timestamp);
 		if (isset($result['errors'])) {
@@ -268,7 +256,7 @@ class ButtercoinClient extends Client
 	 *
 	 * @return mixed
 	 */
-	public function getOrderById($orderId, $timestamp )
+	public function getOrderById($orderId, $timestamp = null)
 	{
 		return $this->_buildCommand('getOrder', $timestamp, ["id" => $orderId], false);
 	}
@@ -281,7 +269,7 @@ class ButtercoinClient extends Client
 	 *
 	 * @return mixed
 	 */
-	public function getOrderByUrl($url, $timestamp )
+	public function getOrderByUrl($url, $timestamp = null)
 	{
 		$orderId = self::_parseId($url);
 		return $this->_buildCommand('getOrder', $timestamp, ["id" => "$orderId"], false);
@@ -295,7 +283,7 @@ class ButtercoinClient extends Client
 	 *
 	 * @return mixed
 	 */
-	public function getOrders($data, $timestamp)
+	public function getOrders($data, $timestamp = null)
 	{
 		$result = $this->_buildCommand('getOrders', $timestamp, $data);
 		if (isset($result['errors'])) {
@@ -313,7 +301,7 @@ class ButtercoinClient extends Client
 	 *
 	 * @return mixed
 	 */
-	public function createOrder($data, $timestamp)
+	public function createOrder($data, $timestamp = null)
 	{
 		$result = $this->_buildCommand('createOrder', $timestamp, $data);
 		if (is_array($result) && isset($result['errors'])) {
@@ -331,7 +319,7 @@ class ButtercoinClient extends Client
 	 *
 	 * @return mixed
 	 */
-	public function cancelOrder($orderId, $timestamp )
+	public function cancelOrder($orderId, $timestamp = null)
 	{
 		$result = $this->_buildCommand('cancelOrder', $timestamp, ["id" => $orderId], false);
 		if (is_array($result) && isset($result['errors'])) {
@@ -349,7 +337,7 @@ class ButtercoinClient extends Client
 	 *
 	 * @return mixed
 	 */
-	public function getTransactionById($transactionId, $timestamp )
+	public function getTransactionById($transactionId, $timestamp = null)
 	{
 		return $this->_buildCommand('getTransaction', $timestamp, ["id" => $transactionId], false);
 	}
@@ -362,7 +350,7 @@ class ButtercoinClient extends Client
 	 *
 	 * @return mixed
 	 */
-	public function getTransactionByUrl($url, $timestamp )
+	public function getTransactionByUrl($url, $timestamp = null)
 	{
 		$transactionId = self::_parseId($url);
 		return $this->_buildCommand('getTransaction', $timestamp, ["id" => "$transactionId"], false);
@@ -376,7 +364,7 @@ class ButtercoinClient extends Client
 	 *
 	 * @return mixed
 	 */
-	public function getTransactions($data, $timestamp)
+	public function getTransactions($data, $timestamp = null)
 	{
 		$result = $this->_buildCommand('getTransactions', $timestamp, $data);
 		if (isset($result['errors'])) {
@@ -394,7 +382,7 @@ class ButtercoinClient extends Client
 	 *
 	 * @return mixed
 	 */
-	public function createDeposit($data, $timestamp)
+	public function createDeposit($data, $timestamp = null)
 	{
 		$result = $this->_buildCommand('createDeposit', $timestamp, $data);
 		if (is_array($result) && isset($result['errors'])) {
@@ -412,7 +400,7 @@ class ButtercoinClient extends Client
 	 *
 	 * @return mixed
 	 */
-	public function createWithdrawal($data, $timestamp)
+	public function createWithdrawal($data, $timestamp = null)
 	{
 		$result = $this->_buildCommand('createWithdrawal', $timestamp, $data);
 		if (is_array($result) && isset($result['errors'])) {
@@ -434,7 +422,7 @@ class ButtercoinClient extends Client
 	 *
 	 * @return mixed
 	 */
-	public function sendCrypto($data, $timestamp)
+	public function sendCrypto($data, $timestamp = null)
 	{
 		$result = $this->_buildCommand('send', $timestamp, $data);
 		if (is_array($result) && isset($result['errors'])) {
@@ -456,7 +444,7 @@ class ButtercoinClient extends Client
 	 *
 	 * @return mixed
 	 */
-	public function cancelTransaction($transactionId, $timestamp )
+	public function cancelTransaction($transactionId, $timestamp = null)
 	{
 		$result = $this->_buildCommand('cancelTransaction', $timestamp, ["id" => $transactionId], false);
 		if (is_array($result) && isset($result['errors'])) {
@@ -501,6 +489,9 @@ class ButtercoinClient extends Client
 	 */
 	private function _setHeaders($url, $timestamp, $authenticate = true)
 	{
+		if (!$timestamp)
+			$timestamp = round(microtime(true) * 1000);
+
 		$params = $this->getConfig()->get('command.params');
 		if ($authenticate === true) {
 			$params['X-Buttercoin-Access-Key'] = $this->getConfig('publicKey');
