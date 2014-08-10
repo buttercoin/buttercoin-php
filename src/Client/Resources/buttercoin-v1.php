@@ -513,7 +513,7 @@ return array(
 			)
 		),
 		'createWithdrawal' => array(
-			'uri'			=> 'transactions/withdrawal',
+			'uri'			=> 'transactions/withdraw',
 			'description'	=> 'create a new withdrawal',
 			'httpMethod'	=> 'POST',
 			'parameters'	=> array(

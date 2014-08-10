@@ -303,6 +303,10 @@ The aim is to take your great ideas and make everyone's experience using Butterc
 - Made timestamp an optional field, defaults to current timestamp
 - Fixed errors in README file
 
+### 0.0.3
+
+- changed withdraw endpoint from /withdrawal to /withdraw
+
 ## License
 
 Licensed under the MIT license.
