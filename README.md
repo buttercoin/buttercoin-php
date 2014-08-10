@@ -5,7 +5,7 @@ Easy integration with the Buttercoin Trading Platform through our API.
 Installation with Composer
 --------------------------
 ```sh
-$ php composer.phar require buttercoin/buttercoin-sdk:~0.0.2
+$ php composer.phar require buttercoin/buttercoin-sdk:~0.0.4
 ```
 
 Usage
