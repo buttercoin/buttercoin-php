@@ -126,7 +126,7 @@ Valid params include (must be added to array in this order):
 
 Name | Param | Description
 --- | --- | ---
-Status | `status` | enum: `['opened', 'reopened', 'filled', 'canceled']`  
+Status | `status` | enum: `['opened', 'partial-filled', 'filled', 'canceled']`  
 Side | `side` | enum: `['buy', 'sell']`  
 Order Type | `orderType` | enum: `['market', 'limit']`  
 Date Min | `dateMin` | format: ISO-8601, e.g. `'2014-05-06T13:15:30Z'`  
