@@ -142,11 +142,8 @@ class ButtercoinClient extends Client
 	public function getXButtercoinSignature($url, $timestamp)
 	{
 		$tsUrl = $timestamp . $url;
-		print_r($timestamp . PHP_EOL);
 		$encodedUrl = base64_encode(utf8_encode($tsUrl));
-		print_r($encodedUrl . PHP_EOL);
 		$signature = base64_encode(hash_hmac('sha256', $encodedUrl, $this->getSecretKey(), TRUE));
-		print_r($signature . PHP_EOL);
 		return $signature;
 	}
 
