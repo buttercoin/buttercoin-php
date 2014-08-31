@@ -29,7 +29,7 @@ Setting | Property Name | Description
 --- | --- | ---
 Public Key | `publicKey` | Your Buttercoin API Public Key  
 Secret Key | `secretKey` | Your Buttercoin API Secret Key  
-Environment | `environment` | Your development environment (default: `'production'`, set to `'staging'` to test with testnet bitcoins)
+Environment | `environment` | Your development environment (default: `'production'`, set to `'sandbox'` to test with testnet bitcoins)
 API Version | `version` | The API Version.  Currently used to version the API URL and Service Description
 
 ###### Example
@@ -41,7 +41,7 @@ date_default_timezone_set('UTC'); // for $timestamp
 $client = ButtercoinClient::factory([
 	'publicKey' => '<public_key>',
 	'secretKey' => '<secret_key>',
-	'environment' => 'staging' // leave this blank for production
+	'environment' => 'sandbox' // leave this blank for production
 ]);
 ```
 
@@ -306,6 +306,10 @@ The aim is to take your great ideas and make everyone's experience using Butterc
 ### 0.0.3
 
 - changed withdraw endpoint from /withdrawal to /withdraw
+
+### 0.0.5
+
+- changed test env to sandbox
 
 ## License
 
