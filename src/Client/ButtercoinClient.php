@@ -29,10 +29,8 @@ class ButtercoinClient extends Client
 		);
 
 		if (isset($config['environment'])) {
-			if ($config['environment'] === 'staging') {
-				$default['baseUrl'] = 'https://api.qa.dcxft.com/{version}/';
-			} else if ($config['environment'] === 'localhost') {
-				$default['baseUrl'] = 'https://localhost:9002/{version}/';
+			if ($config['environment'] === 'sandbox' || $config['environment'] === 'staging') {
+				$default['baseUrl'] = 'https://sandbox.buttercoin.com/{version}/';
 			} else if ($config['environment'] !== 'production') {
 				throw new Exception('Invalid environment');
 			}	
@@ -144,8 +142,11 @@ class ButtercoinClient extends Client
 	public function getXButtercoinSignature($url, $timestamp)
 	{
 		$tsUrl = $timestamp . $url;
+		print_r($timestamp . PHP_EOL);
 		$encodedUrl = base64_encode(utf8_encode($tsUrl));
+		print_r($encodedUrl . PHP_EOL);
 		$signature = base64_encode(hash_hmac('sha256', $encodedUrl, $this->getSecretKey(), TRUE));
+		print_r($signature . PHP_EOL);
 		return $signature;
 	}
 
