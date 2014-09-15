@@ -31,6 +31,20 @@ return array(
 					'required'		=> false
 				)
 			)
+    ),
+    'getTradeHistory' 	=> array(
+			'uri'			=> 'trades',
+			'description'	=> 'get the last 100 trades',
+			'httpMethod'	=> 'GET',
+			'parameters'	=> array(
+				'X-Forwarded-For' 	=> array (
+					'location'		=> 'header',
+					'description'	=> 'localhost ip',
+					'sentAs'		=> 'X-Forwarded-For',
+					'type'			=> 'string',
+					'required'		=> false
+				)
+			)
 		),
 		'getKey'		=> array(
 			'uri'			=> 'key',
