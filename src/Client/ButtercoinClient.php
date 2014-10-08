@@ -201,6 +201,18 @@ class ButtercoinClient extends Client
 	}
 
 	/**
+	 * Shortcut for the getOrderBook command
+	 *
+	 * @return mixed
+	 */
+	public function getTradeHistory()
+	{
+		// set headers, if necessary
+		$this->_setHeaders(null, null, false);
+		return $this->_sendCommand('getTradeHistory');
+	}
+
+	/**
 	 * Shortcut for the getKey command
 	 *
 	 * @param integer $timestamp UNIX timestamp must be within 5 mins of Buttercoin UTC server time

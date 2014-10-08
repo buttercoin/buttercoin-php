@@ -5,7 +5,7 @@ Easy integration with the Buttercoin Trading Platform through our API.
 Installation with Composer
 --------------------------
 ```sh
-$ php composer.phar require buttercoin/buttercoin-sdk:~0.0.4
+$ php composer.phar require buttercoin/buttercoin-sdk:~0.0.6
 ```
 
 Usage
@@ -87,6 +87,13 @@ Return an `array` of current orders in the Buttercoin order book
 
 ```php
 $client->getOrderBook();
+```
+
+**Get Trade History**  
+Return an `array` of the last 100 trades
+
+```php
+$client->getTradeHistory();
 ```
 
 **Get Ticker**  
@@ -294,22 +301,26 @@ The aim is to take your great ideas and make everyone's experience using Butterc
 
 ## Release History
 
-### 0.0.1
+### 0.0.6
 
-- First release.
+- added trade history endpoint
+
+### 0.0.5
+
+- changed test env to sandbox
+
+### 0.0.3
+
+- changed withdraw endpoint from /withdrawal to /withdraw
 
 ### 0.0.2
 
 - Made timestamp an optional field, defaults to current timestamp
 - Fixed errors in README file
 
-### 0.0.3
+### 0.0.1
 
-- changed withdraw endpoint from /withdrawal to /withdraw
-
-### 0.0.5
-
-- changed test env to sandbox
+- First release.
 
 ## License
 
