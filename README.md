@@ -179,7 +179,7 @@ $trxnId = '53a22ce164f23e7301a4fee5';
 $client->getTransactionById($trxnId, $timestamp);
 
 // single transaction by url
-$url = 'https://api.buttercoin.com/v1/orders/{order_id}';
+$url = 'https://api.buttercoin.com/v1/transactions/{transaction_id}';
 
 $client->getTransactionByUrl($url, $timestamp);
 ```
@@ -212,6 +212,8 @@ $client->createOrder($order, $timestamp);
 ```
 
 **Create Transaction**  
+
+_Please contact Buttercoin support before creating a USD deposit using the API_
 
 Deposit transaction params include: 
 
