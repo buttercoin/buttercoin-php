@@ -434,11 +434,11 @@ class ButtercoinClient extends Client
 	 */
 	public function sendCrypto($data, $timestamp = null)
 	{
-		$result = $this->_buildCommand('send', $timestamp, $data);
+		$result = $this->_buildCommand('sendCrypto', $timestamp, $data);
 		if (is_array($result) && isset($result['errors'])) {
 			return $result;
 		} else {
-			if ($result.getStatusCode() === 201) {
+			if ($result->getStatusCode() === 201) {
 				return [ "status" => 201, "message" => "Send request created, but email confirmation is required" ];
 			} else {
 				return [ "status" => 202, "message" => $result->getLocation()];
